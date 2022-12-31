@@ -114,8 +114,20 @@ resource "aws_security_group" "vpc-web" {
 ```
 - Reference the security groups in `ec2instance.tf` file as a list item
 ```t
-# List Item
-vpc_security_group_ids = [aws_security_group.vpc-ssh.id, aws_security_group.vpc-web.id]  
+# ATTACH YOUR SECURITY GROUP TO YOUR INSTANCE
+#Argument : Input
+#Attribute : Output
+#Go to terraform website and search for "aws_instance" --> Arguments --> Make your choice from "vpc_security_group_ids" and "security_groups". In this case,
+#Argument = [ResourceType.ResourceName.Attribute]
+#Since we are attaching this security group to the instance, then
+#Argument = security group id
+#Attribute = id
+#
+#HOW TO GET SECURITY GROUP ID
+# Go back to terraform documentation and look for aws_instance --> Attributes --> Import --> select "id"
+#In this case it will be written as shown below
+
+vpc_security_group_ids = [aws_security_group.vpc-ssh.id, aws_security_group.vpc-web.id]  #Put this line in your instance block
 ```
 
 ## Step-04: ami-datasource.tf - Define Get Latest AMI ID for Amazon Linux2 OS
