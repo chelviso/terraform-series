@@ -197,6 +197,44 @@ output "instance_publicdns" {
 
 ## Step-07: Execute Terraform Commands
 ```t
+
+## DYNAMIC SECURITY BLOCK 
+#Ingress : This refers to outbound ports
+#egress : This refers to inbound ports
+# STEP 1:  Create a variable block and list all the ports as shown below
+********************
+variable "sg_ports" {
+  type        = list(number)
+  description = "list of ingress ports"
+  default     = [8080, 80,21, 22, 443]
+}
+******************
+
+# Create Dynamic Security Group 
+resource "aws_security_group" "vpc-dynamicsg" {
+  name        = "dynamic-sg"
+  description = "Ingress for dev"
+  dynamic "ingress" {
+	for_each = var.sg_ports
+    iterator = port
+		content {
+    from_port   = port.value
+    to_port     = port.value
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+     }
+	}
+  egress {
+    for_each = var.sg_ports
+    content {
+    from_port   = egress.value
+    to_port     = egress.value
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+}
+
 # Terraform Initialize
 terraform init
 Observation:
