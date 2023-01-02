@@ -208,6 +208,8 @@ variable "sg_ports" {
   description = "list of ingress ports"
   default     = [8080, 80,21, 22, 443]
 }
+
+#NB: If you have targetted egress ports you wish to open, you will need to create a similar varialble block for egress rules
 ******************
 
 # Create Dynamic Security Group 
