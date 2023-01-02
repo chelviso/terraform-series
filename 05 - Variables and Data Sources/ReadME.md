@@ -180,6 +180,7 @@ resource "aws_instance" "myec2vm" {
 
 
 ## Step-06: c6-outputs.tf - Define Output Values
+Output block: This is a situation where you are getting data out of the ec2 instance
 - [Output Values](https://www.terraform.io/docs/language/values/outputs.html)
 ```t
 # Terraform Output Values
