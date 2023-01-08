@@ -1,0 +1,136 @@
+# Create a directory call doc which is the module directory
+#create create  a moduel call "sam" and in it create the following main.tf files
+
+*****************datasource file*************************************
+touch datasr.tf
+
+data "aws_ami" "amzlinux2" {
+  most_recent = true
+  owners = [ "amazon" ]
+  filter {
+    name = "name"
+    values = [ "amzn2-ami-kernel-5.10-hvm-*-gp2" ]
+  }
+  filter {
+    name = "root-device-type"
+    values = [ "ebs" ]
+  }
+  filter {
+    name = "virtualization-type"
+    values = [ "hvm" ]
+  }
+  filter {
+    name = "architecture"
+    values = [ "x86_64" ]
+  }
+}
+
+****************************instance file-*******************************
+touch ec2.tf 
+
+resource "aws_instance" "my_ec2" {
+    ami = data.aws_ami.amzlinux2.id 
+    instance_type = var.inst_type
+    key_name = "private_nate"
+    tags = {
+      Name = "dada"
+    }
+    
+}
+
+resource "aws_eip" "lb" {
+  instance = aws_instance.my_ec2.id
+  vpc      = true
+}
+
+*****************************output file ***********************************
+touch output.tf
+
+output "pub_ip" {
+   value = aws_eip.lb.public_ip
+}
+
+output "pri_ip" {
+   value = aws_eip.lb.private_ip
+}
+
+*******************************create a variable file*****************************
+touch variab.tf
+
+variable "key_pair" {
+  description = "EC2 Instance key"
+  type = string
+  default = "private_nate"  
+}
+
+variable "inst_type" {
+   description = "Instance type"
+   type = string 
+   default = "t2.micro"
+ }
+
+************************************** create main.tf file in the doc module/directory********************************
+
+touch doc/main.tf
+
+terraform {
+  required_version = "~> 1.3" # which means any version equal & above 0.14 like 0.15, 0.16 etc and < 1.xx
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+# Provider Block
+provider "aws" {
+  region = "us-east-1"
+}
+
+module "dada" {
+    source = "./sam"
+
+}
+
+output "pri_module" {
+    value = module.dada.pri_ip
+}
+
+output "pub_module" {
+    value = module.dada.pub_ip
+}
+
+
+*******************************************************
+
+#STEP 1
+Configure your terraform setting Block
+
+#STEP 2
+Configure your terraform provider block 
+
+#STEP 3
+Setup your module as shown below. Your might have as many module as possible 
+
+module "dada" {
+    source = "./sam"
+    eczname = "myinst"
+
+}
+
+dada : This is the module name and you could use any other name 
+same: This is your module/directory 
+eczname = "myinst": You can define as such any variable that has not been defined 
+
+#STEP4
+To output any value, first we must output that value in the module before creating output in the main.tf
+
+output "pri_module" {
+    value = module.dada.pri_ip
+}
+
+#pri_module: This can be any name of your choice 
+
+#dada : This is the module name as defined in the module block 
+
+#pri _ip : This is the output object name
